@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
+import '@/styles/uber-design.css'
 
 interface Message {
   id: string
@@ -50,7 +51,6 @@ export default function ChatPage() {
 
         setOrganization(orgData)
 
-        // Load conversation history
         const { data: conversations } = await supabase
           .from('conversations')
           .select('*')
@@ -133,7 +133,6 @@ export default function ChatPage() {
             const text = decoder.decode(value)
             fullResponse += text
 
-            // Parse streaming response
             const lines = fullResponse.split('\n')
             for (let i = 0; i < lines.length - 1; i++) {
               const line = lines[i]
@@ -168,47 +167,84 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col">
-      <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">ShahojAI Chat</h1>
-          </div>
-        </div>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#ffffff' }}>
+      {/* Navigation */}
+      <nav style={{ borderBottom: '1px solid #e0e0e0', padding: '16px 32px' }}>
+        <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#000000', margin: 0 }}>Chat</h1>
       </nav>
 
-      <div className="flex-1 overflow-y-auto p-4 md:p-8 max-w-4xl w-full mx-auto">
-        <div className="space-y-6">
+      {/* Messages Container */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '32px', maxWidth: '900px', width: '100%', margin: '0 auto' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           {messages.length === 0 && (
-            <div className="text-center py-12">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Start a conversation</h2>
-              <p className="text-gray-600 dark:text-gray-400">Ask questions about your products or services</p>
+            <div style={{ textAlign: 'center', paddingTop: '48px' }}>
+              <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#000000', marginBottom: '8px' }}>
+                Start a conversation
+              </h2>
+              <p style={{ fontSize: '16px', color: '#757575' }}>Ask anything about your products or services</p>
             </div>
           )}
 
           {messages.map((message) => (
-            <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+            <div key={message.id} style={{ display: 'flex', justifyContent: message.role === 'user' ? 'flex-end' : 'flex-start' }}>
               <div
-                className={`max-w-md lg:max-w-lg px-4 py-3 rounded-lg ${
-                  message.role === 'user'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700'
-                }`}
+                style={{
+                  maxWidth: '70%',
+                  padding: '12px 16px',
+                  borderRadius: '12px',
+                  ...(message.role === 'user'
+                    ? {
+                        background: '#000000',
+                        color: '#ffffff',
+                        borderBottomLeftRadius: '12px',
+                        borderBottomRightRadius: '4px',
+                      }
+                    : {
+                        background: '#f5f5f5',
+                        color: '#000000',
+                        borderBottomLeftRadius: '4px',
+                        borderBottomRightRadius: '12px',
+                      }),
+                }}
               >
-                <p className="text-sm md:text-base">{message.content}</p>
-                <p className="text-xs mt-1 opacity-70">{message.timestamp.toLocaleTimeString()}</p>
+                <p style={{ fontSize: '16px', lineHeight: '1.5', margin: '0 0 4px 0' }}>{message.content}</p>
+                <p style={{ fontSize: '12px', opacity: 0.6, margin: 0 }}>{message.timestamp.toLocaleTimeString()}</p>
               </div>
             </div>
           ))}
 
           {loading && (
-            <div className="flex justify-start">
-              <div className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 px-4 py-3 rounded-lg">
-                <div className="flex space-x-2">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+              <div style={{ background: '#f5f5f5', padding: '12px 16px', borderRadius: '12px', display: 'flex', gap: '4px' }}>
+                <div
+                  style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: '#bdbdbd',
+                    animation: 'loading-pulse 1.4s infinite',
+                  }}
+                />
+                <div
+                  style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: '#bdbdbd',
+                    animation: 'loading-pulse 1.4s infinite',
+                    animationDelay: '0.2s',
+                  }}
+                />
+                <div
+                  style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: '#bdbdbd',
+                    animation: 'loading-pulse 1.4s infinite',
+                    animationDelay: '0.4s',
+                  }}
+                />
               </div>
             </div>
           )}
@@ -217,25 +253,55 @@ export default function ChatPage() {
         </div>
       </div>
 
-      <div className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 md:p-8">
-        <form onSubmit={handleSendMessage} className="max-w-4xl mx-auto flex gap-3">
+      {/* Input Area */}
+      <div style={{ borderTop: '1px solid #e0e0e0', background: '#ffffff', padding: '24px 32px' }}>
+        <form onSubmit={handleSendMessage} style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', gap: '12px' }}>
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={loading}
-            placeholder="Type your question here..."
-            className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+            placeholder="Ask a question..."
+            style={{
+              flex: 1,
+              padding: '12px 16px',
+              border: '1px solid #e0e0e0',
+              borderRadius: '12px',
+              fontSize: '16px',
+              fontFamily: 'inherit',
+              transition: 'all 150ms',
+            }}
           />
           <button
             type="submit"
             disabled={loading || !input.trim()}
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition disabled:opacity-50"
+            style={{
+              padding: '12px 24px',
+              background: loading || !input.trim() ? '#bdbdbd' : '#000000',
+              color: '#ffffff',
+              fontWeight: '600',
+              fontSize: '16px',
+              border: 'none',
+              borderRadius: '12px',
+              cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
+              transition: 'all 150ms',
+            }}
           >
             Send
           </button>
         </form>
       </div>
+
+      <style>{`
+        @keyframes loading-pulse {
+          0%, 100% {
+            opacity: 0.3;
+          }
+          50% {
+            opacity: 1;
+          }
+        }
+      `}</style>
     </div>
   )
 }

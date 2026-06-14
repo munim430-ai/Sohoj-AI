@@ -1,0 +1,331 @@
+/* Uber-inspired Design System */
+
+:root {
+  /* Typography */
+  --font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+  --font-display: 'Uber Move', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Colors - Uber Dark Theme */
+  --uber-black: #000000;
+  --uber-white: #ffffff;
+  --uber-gray-1: #1a1a1a;
+  --uber-gray-2: #2d2d2d;
+  --uber-gray-3: #4a4a4a;
+  --uber-gray-4: #757575;
+  --uber-gray-5: #e0e0e0;
+  --uber-gray-6: #f5f5f5;
+
+  /* Accent Colors */
+  --uber-primary: #000000;
+  --uber-accent: #ffffff;
+  --uber-action: #1a73e8;
+  --uber-success: #34a853;
+  --uber-warning: #fbbc04;
+  --uber-error: #ea4335;
+
+  /* Shadows - Uber minimal */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 3px 6px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.10);
+  --shadow-xl: 0 15px 25px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05);
+
+  /* Spacing - 4px base unit */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* Border Radius - Uber rounded corners */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-primary);
+  background: var(--uber-white);
+  color: var(--uber-black);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+h2 {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+h3 {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+h4 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+h5 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+h6 {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--uber-gray-4);
+}
+
+/* Components */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-primary);
+  font-weight: 600;
+  font-size: 16px;
+  padding: var(--space-4) var(--space-6);
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  gap: var(--space-2);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--uber-black);
+  color: var(--uber-white);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--uber-gray-1);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+  background: var(--uber-gray-6);
+  color: var(--uber-black);
+  border: 1px solid var(--uber-gray-5);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--uber-gray-5);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-tertiary {
+  background: transparent;
+  color: var(--uber-black);
+  text-decoration: underline;
+}
+
+.btn-tertiary:hover:not(:disabled) {
+  color: var(--uber-action);
+}
+
+/* Input Fields - Uber Style */
+input,
+textarea {
+  font-family: var(--font-primary);
+  font-size: 16px;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--uber-gray-5);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-fast);
+  background: var(--uber-white);
+  color: var(--uber-black);
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--uber-black);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+input::placeholder {
+  color: var(--uber-gray-4);
+}
+
+/* Cards */
+.card {
+  background: var(--uber-white);
+  border: 1px solid var(--uber-gray-5);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+}
+
+.card:hover {
+  border-color: var(--uber-gray-4);
+  box-shadow: var(--shadow-md);
+}
+
+/* Navigation */
+nav {
+  background: var(--uber-white);
+  border-bottom: 1px solid var(--uber-gray-5);
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+}
+
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--uber-black);
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: var(--space-5);
+}
+
+.nav-links a {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--uber-gray-4);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.nav-links a:hover {
+  color: var(--uber-black);
+}
+
+/* Messages/Chat */
+.message {
+  display: flex;
+  margin-bottom: var(--space-4);
+  gap: var(--space-3);
+}
+
+.message.user {
+  justify-content: flex-end;
+}
+
+.message-content {
+  max-width: 70%;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.message.user .message-content {
+  background: var(--uber-black);
+  color: var(--uber-white);
+  border-radius: var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg);
+}
+
+.message.assistant .message-content {
+  background: var(--uber-gray-6);
+  color: var(--uber-black);
+  border-radius: var(--radius-sm) var(--radius-lg) var(--radius-lg) var(--radius-lg);
+}
+
+/* Loading State */
+.loading {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.loading-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--uber-gray-4);
+  animation: loading-pulse 1.4s infinite;
+}
+
+.loading-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes loading-pulse {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 28px;
+  }
+
+  h2 {
+    font-size: 24px;
+  }
+
+  .message-content {
+    max-width: 85%;
+  }
+
+  nav {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .nav-links {
+    gap: var(--space-4);
+  }
+}

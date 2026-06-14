@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import '@/styles/uber-design.css'
 
 interface Stats {
   totalConversations: number
@@ -40,7 +41,6 @@ export default function DashboardPage() {
           return
         }
 
-        // Get user's organization
         const { data: userData } = await supabase
           .from('users')
           .select('organization_id')
@@ -52,7 +52,6 @@ export default function DashboardPage() {
           return
         }
 
-        // Get organization details
         const { data: orgData } = await supabase
           .from('organizations')
           .select('*')
@@ -61,7 +60,6 @@ export default function DashboardPage() {
 
         setOrganization(orgData)
 
-        // Get stats
         const { count: conversationCount } = await supabase
           .from('conversations')
           .select('*', { count: 'exact', head: true })
@@ -89,129 +87,159 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-600 dark:text-gray-400">Loading...</div>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#ffffff' }}>
+        <p style={{ color: '#757575' }}>Loading...</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center space-x-8">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">ShahojAI</h1>
-              <div className="hidden md:flex space-x-8">
-                <Link href="/dashboard" className="text-gray-900 dark:text-white font-semibold">
-                  Dashboard
-                </Link>
-                <Link href="/chat" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
-                  Chat
-                </Link>
-                <Link href="/settings" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
-                  Settings
-                </Link>
-              </div>
-            </div>
-            <Link href="/settings" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
-              Profile
+    <div style={{ minHeight: '100vh', background: '#ffffff' }}>
+      {/* Navigation */}
+      <nav style={{ borderBottom: '1px solid #e0e0e0', padding: '16px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '48px' }}>
+          <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#000000' }}>ShahojAI</h1>
+          <div style={{ display: 'flex', gap: '32px' }}>
+            <Link href="/dashboard" style={{ fontSize: '16px', fontWeight: '500', color: '#000000', textDecoration: 'none' }}>
+              Dashboard
+            </Link>
+            <Link href="/chat" style={{ fontSize: '16px', fontWeight: '400', color: '#757575', textDecoration: 'none' }}>
+              Chat
+            </Link>
+            <Link href="/settings" style={{ fontSize: '16px', fontWeight: '400', color: '#757575', textDecoration: 'none' }}>
+              Settings
             </Link>
           </div>
         </div>
+        <Link href="/settings" style={{ fontSize: '16px', color: '#757575', textDecoration: 'none' }}>
+          Profile
+        </Link>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* Main Content */}
+      <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '48px 32px' }}>
         {organization && (
           <>
-            <div className="mb-12">
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Welcome back, {organization.name}!</h2>
-              <p className="text-gray-600 dark:text-gray-400">
-                Here's your customer support activity overview.
-              </p>
+            {/* Header */}
+            <div style={{ marginBottom: '48px' }}>
+              <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#000000', marginBottom: '8px' }}>
+                Welcome back, {organization.name}
+              </h2>
+              <p style={{ fontSize: '16px', color: '#757575' }}>Here's your customer support overview</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12">
-              <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-6 border-l-4 border-blue-500">
-                <p className="text-gray-600 dark:text-gray-400 text-sm font-semibold uppercase">Conversations</p>
-                <p className="text-4xl font-bold text-gray-900 dark:text-white mt-2">{stats.totalConversations}</p>
-                <p className="text-gray-500 dark:text-gray-500 text-xs mt-2">Total conversations</p>
+            {/* Stats Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px', marginBottom: '48px' }}>
+              {/* Stat Card 1 */}
+              <div style={{ background: '#ffffff', border: '1px solid #e0e0e0', borderRadius: '12px', padding: '24px', borderLeft: '3px solid #1a73e8' }}>
+                <p style={{ fontSize: '14px', fontWeight: '500', color: '#757575', textTransform: 'uppercase' }}>Conversations</p>
+                <p style={{ fontSize: '36px', fontWeight: '700', color: '#000000', margin: '16px 0 0 0' }}>
+                  {stats.totalConversations}
+                </p>
+                <p style={{ fontSize: '12px', color: '#bdbdbd', marginTop: '8px' }}>Total conversations</p>
               </div>
 
-              <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-6 border-l-4 border-green-500">
-                <p className="text-gray-600 dark:text-gray-400 text-sm font-semibold uppercase">Credit Balance</p>
-                <p className="text-4xl font-bold text-gray-900 dark:text-white mt-2">{organization.credit_balance}</p>
-                <p className="text-gray-500 dark:text-gray-500 text-xs mt-2">Credits remaining</p>
+              {/* Stat Card 2 */}
+              <div style={{ background: '#ffffff', border: '1px solid #e0e0e0', borderRadius: '12px', padding: '24px', borderLeft: '3px solid #34a853' }}>
+                <p style={{ fontSize: '14px', fontWeight: '500', color: '#757575', textTransform: 'uppercase' }}>Credits</p>
+                <p style={{ fontSize: '36px', fontWeight: '700', color: '#000000', margin: '16px 0 0 0' }}>
+                  {organization.credit_balance}
+                </p>
+                <p style={{ fontSize: '12px', color: '#bdbdbd', marginTop: '8px' }}>Credits remaining</p>
               </div>
 
-              <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-6 border-l-4 border-purple-500">
-                <p className="text-gray-600 dark:text-gray-400 text-sm font-semibold uppercase">Documents</p>
-                <p className="text-4xl font-bold text-gray-900 dark:text-white mt-2">{stats.documentsCount}</p>
-                <p className="text-gray-500 dark:text-gray-500 text-xs mt-2">FAQ documents uploaded</p>
+              {/* Stat Card 3 */}
+              <div style={{ background: '#ffffff', border: '1px solid #e0e0e0', borderRadius: '12px', padding: '24px', borderLeft: '3px solid #ea4335' }}>
+                <p style={{ fontSize: '14px', fontWeight: '500', color: '#757575', textTransform: 'uppercase' }}>Documents</p>
+                <p style={{ fontSize: '36px', fontWeight: '700', color: '#000000', margin: '16px 0 0 0' }}>
+                  {stats.documentsCount}
+                </p>
+                <p style={{ fontSize: '12px', color: '#bdbdbd', marginTop: '8px' }}>Knowledge base files</p>
               </div>
 
-              <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-6 border-l-4 border-orange-500">
-                <p className="text-gray-600 dark:text-gray-400 text-sm font-semibold uppercase">Plan</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2 capitalize">
+              {/* Stat Card 4 */}
+              <div style={{ background: '#ffffff', border: '1px solid #e0e0e0', borderRadius: '12px', padding: '24px', borderLeft: '3px solid #fbbc04' }}>
+                <p style={{ fontSize: '14px', fontWeight: '500', color: '#757575', textTransform: 'uppercase' }}>Plan</p>
+                <p style={{ fontSize: '24px', fontWeight: '700', color: '#000000', margin: '16px 0 0 0', textTransform: 'capitalize' }}>
                   {organization.subscription_tier}
                 </p>
-                <Link
-                  href="/billing"
-                  className="text-blue-600 hover:text-blue-700 text-xs mt-2 inline-block font-semibold"
-                >
+                <Link href="/billing" style={{ fontSize: '12px', color: '#1a73e8', textDecoration: 'none', fontWeight: '500', marginTop: '8px', display: 'inline-block' }}>
                   Upgrade →
                 </Link>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
-              <div className="lg:col-span-2 bg-white dark:bg-gray-900 rounded-lg shadow p-6">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
-                <div className="space-y-3">
+            {/* Quick Actions */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+              <div style={{ background: '#ffffff', border: '1px solid #e0e0e0', borderRadius: '12px', padding: '24px' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#000000', marginBottom: '16px' }}>Quick actions</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   <Link
                     href="/chat"
-                    className="block p-4 border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                    style={{
+                      padding: '16px',
+                      border: '1px solid #e0e0e0',
+                      borderRadius: '12px',
+                      textDecoration: 'none',
+                      color: 'inherit',
+                      transition: 'all 150ms',
+                    }}
                   >
-                    <p className="font-semibold text-gray-900 dark:text-white">Start a Chat</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Test your AI agent with a new conversation</p>
+                    <p style={{ fontWeight: '600', color: '#000000', margin: '0 0 4px 0' }}>Start a chat</p>
+                    <p style={{ fontSize: '14px', color: '#757575', margin: 0 }}>Test your AI agent</p>
                   </Link>
                   <Link
                     href="/settings?tab=documents"
-                    className="block p-4 border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                    style={{
+                      padding: '16px',
+                      border: '1px solid #e0e0e0',
+                      borderRadius: '12px',
+                      textDecoration: 'none',
+                      color: 'inherit',
+                      transition: 'all 150ms',
+                    }}
                   >
-                    <p className="font-semibold text-gray-900 dark:text-white">Upload FAQ</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Add new knowledge base documents</p>
+                    <p style={{ fontWeight: '600', color: '#000000', margin: '0 0 4px 0' }}>Upload FAQ</p>
+                    <p style={{ fontSize: '14px', color: '#757575', margin: 0 }}>Add knowledge base files</p>
                   </Link>
                   <Link
                     href="/billing"
-                    className="block p-4 border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                    style={{
+                      padding: '16px',
+                      border: '1px solid #e0e0e0',
+                      borderRadius: '12px',
+                      textDecoration: 'none',
+                      color: 'inherit',
+                      transition: 'all 150ms',
+                    }}
                   >
-                    <p className="font-semibold text-gray-900 dark:text-white">Buy Credits</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Purchase more API credits for conversations</p>
+                    <p style={{ fontWeight: '600', color: '#000000', margin: '0 0 4px 0' }}>Buy credits</p>
+                    <p style={{ fontSize: '14px', color: '#757575', margin: 0 }}>Purchase more credits</p>
                   </Link>
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-6">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Resources</h3>
-                <ul className="space-y-2 text-sm">
+              {/* Resources */}
+              <div style={{ background: '#ffffff', border: '1px solid #e0e0e0', borderRadius: '12px', padding: '24px' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#000000', marginBottom: '16px' }}>Resources</h3>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <li>
-                    <a href="#" className="text-blue-600 hover:text-blue-700 font-semibold">
+                    <a href="#" style={{ fontSize: '14px', color: '#1a73e8', textDecoration: 'none', fontWeight: '500' }}>
                       Documentation
                     </a>
                   </li>
                   <li>
-                    <a href="#" className="text-blue-600 hover:text-blue-700 font-semibold">
+                    <a href="#" style={{ fontSize: '14px', color: '#1a73e8', textDecoration: 'none', fontWeight: '500' }}>
                       API Reference
                     </a>
                   </li>
                   <li>
-                    <a href="#" className="text-blue-600 hover:text-blue-700 font-semibold">
+                    <a href="#" style={{ fontSize: '14px', color: '#1a73e8', textDecoration: 'none', fontWeight: '500' }}>
                       Widget Setup
                     </a>
                   </li>
                   <li>
-                    <a href="#" className="text-blue-600 hover:text-blue-700 font-semibold">
+                    <a href="#" style={{ fontSize: '14px', color: '#1a73e8', textDecoration: 'none', fontWeight: '500' }}>
                       Support
                     </a>
                   </li>

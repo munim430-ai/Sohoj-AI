@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
+import '@/styles/uber-design.css'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -27,7 +28,6 @@ export default function SignupPage() {
     setError('')
 
     try {
-      // Sign up user
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
@@ -43,7 +43,6 @@ export default function SignupPage() {
         return
       }
 
-      // Create organization
       const slug = generateSlug(companyName) + '-' + Date.now().toString().slice(-6)
 
       const response = await fetch('/api/organization', {
@@ -74,17 +73,15 @@ export default function SignupPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 px-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 max-w-md text-center">
-          <div className="mb-4">
-            <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto">
-              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#ffffff', padding: '16px' }}>
+        <div style={{ width: '100%', maxWidth: '420px', background: '#ffffff', borderRadius: '12px', border: '1px solid #e0e0e0', padding: '32px', textAlign: 'center' }}>
+          <div style={{ width: '48px', height: '48px', background: '#e8f5e9', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+            <svg style={{ width: '24px', height: '24px', color: '#2e7d32' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Check your email</h2>
-          <p className="text-gray-600 dark:text-gray-400">
+          <h2 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '8px', color: '#000000' }}>Check your email</h2>
+          <p style={{ color: '#757575', fontSize: '16px', lineHeight: '1.5' }}>
             We've sent a confirmation link to <strong>{email}</strong>. Please verify your email to get started.
           </p>
         </div>
@@ -93,71 +90,110 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 px-4">
-      <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">ShahojAI</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">Create Your Account</p>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#ffffff', padding: '16px' }}>
+      <div style={{ width: '100%', maxWidth: '420px' }}>
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+          <h1 style={{ fontSize: '32px', fontWeight: '700', marginBottom: '8px', color: '#000000' }}>ShahojAI</h1>
+          <p style={{ fontSize: '16px', color: '#757575' }}>Create your account</p>
         </div>
 
-        <form onSubmit={handleSignup} className="space-y-4">
+        {/* Form */}
+        <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Company Name
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px', color: '#000000' }}>
+              Company name
             </label>
             <input
               type="text"
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: '1px solid #e0e0e0',
+                borderRadius: '12px',
+                fontSize: '16px',
+                fontFamily: 'inherit',
+              }}
               placeholder="Your Company"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Email
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px', color: '#000000' }}>
+              Email address
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: '1px solid #e0e0e0',
+                borderRadius: '12px',
+                fontSize: '16px',
+                fontFamily: 'inherit',
+              }}
               placeholder="you@example.com"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px', color: '#000000' }}>
               Password
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: '1px solid #e0e0e0',
+                borderRadius: '12px',
+                fontSize: '16px',
+                fontFamily: 'inherit',
+              }}
               placeholder="••••••••"
               required
             />
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Min. 6 characters</p>
+            <p style={{ fontSize: '12px', color: '#757575', marginTop: '4px' }}>Min. 6 characters</p>
           </div>
 
-          {error && <div className="p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg text-sm">{error}</div>}
+          {error && (
+            <div style={{ padding: '12px 16px', background: '#fee', border: '1px solid #fcc', borderRadius: '12px', color: '#c33', fontSize: '14px' }}>
+              {error}
+            </div>
+          )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition disabled:opacity-50"
+            style={{
+              width: '100%',
+              padding: '12px 16px',
+              background: loading ? '#ccc' : '#000000',
+              color: '#ffffff',
+              fontWeight: '600',
+              fontSize: '16px',
+              border: 'none',
+              borderRadius: '12px',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              transition: 'all 150ms',
+            }}
           >
-            {loading ? 'Creating account...' : 'Sign Up'}
+            {loading ? 'Creating account...' : 'Create account'}
           </button>
         </form>
 
-        <p className="text-center mt-6 text-gray-600 dark:text-gray-400">
+        {/* Sign in link */}
+        <p style={{ textAlign: 'center', color: '#757575', fontSize: '14px' }}>
           Already have an account?{' '}
-          <Link href="/login" className="text-blue-600 hover:text-blue-700 font-semibold">
+          <Link href="/login" style={{ color: '#1a73e8', textDecoration: 'none', fontWeight: '500' }}>
             Sign in
           </Link>
         </p>

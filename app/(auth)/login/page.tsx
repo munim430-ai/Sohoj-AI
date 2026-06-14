@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
+import '@/styles/uber-design.css'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -55,70 +56,118 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 px-4">
-      <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">ShahojAI</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">Customer Support Agent</p>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#ffffff', padding: '16px' }}>
+      <div style={{ width: '100%', maxWidth: '420px' }}>
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+          <h1 style={{ fontSize: '32px', fontWeight: '700', marginBottom: '8px', color: '#000000' }}>ShahojAI</h1>
+          <p style={{ fontSize: '16px', color: '#757575' }}>AI-powered customer support</p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        {/* Form */}
+        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Email
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px', color: '#000000' }}>
+              Email address
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: '1px solid #e0e0e0',
+                borderRadius: '12px',
+                fontSize: '16px',
+                fontFamily: 'inherit',
+                transition: 'all 150ms',
+              }}
               placeholder="you@example.com"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px', color: '#000000' }}>
               Password
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: '1px solid #e0e0e0',
+                borderRadius: '12px',
+                fontSize: '16px',
+                fontFamily: 'inherit',
+                transition: 'all 150ms',
+              }}
               placeholder="••••••••"
               required
             />
           </div>
 
-          {error && <div className="p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg text-sm">{error}</div>}
+          {error && (
+            <div style={{ padding: '12px 16px', background: '#fee', border: '1px solid #fcc', borderRadius: '12px', color: '#c33', fontSize: '14px' }}>
+              {error}
+            </div>
+          )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition disabled:opacity-50"
+            style={{
+              width: '100%',
+              padding: '12px 16px',
+              background: loading ? '#ccc' : '#000000',
+              color: '#ffffff',
+              fontWeight: '600',
+              fontSize: '16px',
+              border: 'none',
+              borderRadius: '12px',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              transition: 'all 150ms',
+            }}
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
 
-        <div className="my-6 flex items-center">
-          <div className="flex-1 border-t border-gray-300 dark:border-gray-600"></div>
-          <span className="px-3 text-gray-500 dark:text-gray-400 text-sm">Or</span>
-          <div className="flex-1 border-t border-gray-300 dark:border-gray-600"></div>
+        {/* Divider */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
+          <div style={{ flex: 1, height: '1px', background: '#e0e0e0' }} />
+          <span style={{ color: '#757575', fontSize: '14px' }}>or</span>
+          <div style={{ flex: 1, height: '1px', background: '#e0e0e0' }} />
         </div>
 
+        {/* Google Button */}
         <button
           onClick={handleGoogleLogin}
           disabled={loading}
-          className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-semibold py-2 rounded-lg transition disabled:opacity-50"
+          style={{
+            width: '100%',
+            padding: '12px 16px',
+            background: '#f5f5f5',
+            color: '#000000',
+            fontWeight: '600',
+            fontSize: '16px',
+            border: '1px solid #e0e0e0',
+            borderRadius: '12px',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            transition: 'all 150ms',
+            opacity: loading ? 0.5 : 1,
+          }}
         >
-          Sign in with Google
+          Continue with Google
         </button>
 
-        <p className="text-center mt-6 text-gray-600 dark:text-gray-400">
+        {/* Sign up link */}
+        <p style={{ textAlign: 'center', marginTop: '24px', color: '#757575', fontSize: '14px' }}>
           Don't have an account?{' '}
-          <Link href="/signup" className="text-blue-600 hover:text-blue-700 font-semibold">
+          <Link href="/signup" style={{ color: '#1a73e8', textDecoration: 'none', fontWeight: '500' }}>
             Sign up
           </Link>
         </p>
