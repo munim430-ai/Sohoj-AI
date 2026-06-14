@@ -1,0 +1,27 @@
+{
+  "name": "ShahojAI — AI Customer Support",
+  "short_name": "ShahojAI",
+  "description": "AI customer support agent for Bangladeshi e-commerce sellers. Answers in Bangla and English from your own FAQs.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "lang": "en",
+  "dir": "ltr",
+  "theme_color": "#000000",
+  "background_color": "#ffffff",
+  "categories": ["business", "productivity", "shopping"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo-mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -1,46 +1,43 @@
 export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { requireAuth, AuthError } from '@/lib/auth-helpers'
 import { createCheckout } from '@/lib/payment'
+import { checkoutSchema } from '@/lib/validation'
+import { rateLimit, clientKey } from '@/lib/rate-limit'
 
 export async function POST(request: NextRequest) {
+  const rl = rateLimit(clientKey(request, 'checkout'), 10, 60_000)
+  if (!rl.allowed) {
+    return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
+  }
+
+  let auth
   try {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    auth = await requireAuth()
+  } catch (e) {
+    const status = e instanceof AuthError ? e.status : 401
+    return NextResponse.json({ error: 'Authentication required' }, { status })
+  }
 
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+  const parsed = checkoutSchema.safeParse(await request.json().catch(() => null))
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: parsed.error.issues[0]?.message ?? 'Invalid request' },
+      { status: 400 },
+    )
+  }
 
-    const { organizationId, amount, creditsToAdd } = await request.json()
-
-    if (!organizationId || !amount || !creditsToAdd) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
-    }
-
-    // Verify user has access to this organization
-    const { data: userData } = await supabase
-      .from('users')
-      .select('organization_id')
-      .eq('auth_id', user.id)
-      .eq('organization_id', organizationId)
-      .single()
-
-    if (!userData) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
-    }
-
-    // Create checkout URL with aamarPay
-    const checkoutUrl = await createCheckout({
-      organizationId,
-      amount,
-      creditsToAdd,
+  try {
+    // organizationId is taken from the session, never from the client.
+    const url = await createCheckout({
+      organizationId: auth.organizationId,
+      amount: parsed.data.amount,
+      creditsToAdd: parsed.data.creditsToAdd,
+      customer: { name: 'Customer', email: auth.email, phone: '01700000000' },
     })
-
-    return NextResponse.json({ url: checkoutUrl })
+    return NextResponse.json({ url })
   } catch (error: any) {
-    console.error('Checkout creation error:', error)
-    return NextResponse.json({ error: error.message || 'Failed to create checkout' }, { status: 500 })
+    console.error('Checkout error:', error)
+    return NextResponse.json({ error: 'Failed to start checkout' }, { status: 500 })
   }
 }

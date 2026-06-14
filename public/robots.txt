@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+Disallow: /widget
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /billing
+Disallow: /onboard
+
+Sitemap: https://shahojai.com/sitemap.xml

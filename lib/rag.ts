@@ -1,16 +1,24 @@
+/**
+ * Retrieval-Augmented Generation core.
+ *
+ * Chat completions run on Groq (OpenAI-compatible, free tier) — the cheapest
+ * route. Credit accounting is atomic (see `deductCredits`).
+ */
 import { OpenAI } from 'openai'
 import { searchVectors } from './qdrant-server'
-import { supabase } from './supabase'
+import { supabaseAdmin } from './supabase-server'
+import { serverEnv } from './env'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || 'placeholder-openai-key',
-})
+let _llm: OpenAI | null = null
+function llm(): OpenAI {
+  if (!_llm) {
+    _llm = new OpenAI({ apiKey: serverEnv.llmApiKey, baseURL: serverEnv.llmBaseUrl })
+  }
+  return _llm
+}
 
 export interface RAGContext {
-  chunks: Array<{
-    content: string
-    score: number
-  }>
+  chunks: Array<{ content: string; score: number }>
 }
 
 export async function retrieveContext(
@@ -19,12 +27,10 @@ export async function retrieveContext(
   embedding: number[],
 ): Promise<RAGContext> {
   const results = await searchVectors(organizationId, embedding, 3)
-
   const chunks = results.map((result: any) => ({
     content: result.payload?.text || '',
     score: result.score,
   }))
-
   return { chunks }
 }
 
@@ -47,55 +53,46 @@ If the information doesn't contain the answer, honestly say you don't know.`
       ? `Based on the following information:\n\n${context.chunks.map((c) => c.content).join('\n\n')}`
       : 'No relevant information found in the knowledge base.'
 
-  const messages = [
-    {
-      role: 'system' as const,
-      content: systemPrompt,
-    },
-    {
-      role: 'user' as const,
-      content: `${contextText}\n\nQuestion: ${query}`,
-    },
-  ]
-
-  const response = await openai.chat.completions.create({
-    model: 'gpt-3.5-turbo',
-    messages,
-    temperature: 0.7,
+  const response = await llm().chat.completions.create({
+    model: serverEnv.llmModel,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: `${contextText}\n\nQuestion: ${query}` },
+    ],
+    temperature: 0.4,
     max_tokens: 500,
   })
 
-  return response.choices[0].message.content || 'Unable to generate response'
+  return response.choices[0]?.message?.content || 'Unable to generate response'
 }
 
-export async function deductCredits(organizationId: string, tokensUsed: number): Promise<boolean> {
-  const creditsToDeduct = Math.ceil(tokensUsed / 1000) // 1 credit per ~1000 tokens
+export interface DeductResult {
+  ok: boolean
+  reason?: 'insufficient_credits' | 'not_found'
+  remaining?: number
+}
 
-  const { data: org, error: fetchError } = await supabase
-    .from('organizations')
-    .select('credit_balance, subscription_tier')
-    .eq('id', organizationId)
-    .single()
+/**
+ * Atomically deduct credits using a Postgres function that decrements only when
+ * the balance is sufficient (or the org is on the unlimited Enterprise tier).
+ * This avoids the read-then-write race where concurrent requests overspend.
+ */
+export async function deductCredits(
+  organizationId: string,
+  creditsToDeduct = 1,
+): Promise<DeductResult> {
+  const { data, error } = await supabaseAdmin().rpc('deduct_credits', {
+    p_org_id: organizationId,
+    p_amount: creditsToDeduct,
+  })
 
-  if (fetchError || !org) {
-    return false
+  if (error) {
+    return { ok: false, reason: 'not_found' }
   }
 
-  // Enterprise tier has unlimited credits (-1)
-  if (org.subscription_tier === 'enterprise') {
-    return true
+  const row = Array.isArray(data) ? data[0] : data
+  if (!row || row.success === false) {
+    return { ok: false, reason: 'insufficient_credits', remaining: row?.remaining }
   }
-
-  if (org.credit_balance < creditsToDeduct) {
-    return false
-  }
-
-  const { error: updateError } = await supabase
-    .from('organizations')
-    .update({
-      credit_balance: org.credit_balance - creditsToDeduct,
-    })
-    .eq('id', organizationId)
-
-  return !updateError
+  return { ok: true, remaining: row.remaining }
 }

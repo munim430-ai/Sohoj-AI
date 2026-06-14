@@ -1,0 +1,7 @@
+<svg width="196" height="40" viewBox="0 0 196 40" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ShahojAI">
+  <!-- Mark -->
+  <path d="M8 4h24a4 4 0 0 1 4 4v18a4 4 0 0 1-4 4H16.5L9 36.5a1 1 0 0 1-1.7-.7V30H8a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4Z" fill="#000000"/>
+  <path d="M20 9.5l2.1 5.9a3 3 0 0 0 1.8 1.8l5.9 2.1-5.9 2.1a3 3 0 0 0-1.8 1.8L20 29.1l-2.1-5.9a3 3 0 0 0-1.8-1.8L10.2 19.3l5.9-2.1a3 3 0 0 0 1.8-1.8L20 9.5Z" fill="#ffffff"/>
+  <!-- Wordmark -->
+  <text x="50" y="27" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="22" font-weight="700" letter-spacing="-0.5" fill="#000000">Shahoj<tspan fill="#1a73e8">AI</tspan></text>
+</svg>

@@ -3,25 +3,12 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
-    ],
+    remotePatterns: [{ protocol: 'https', hostname: '**' }],
   },
   experimental: {
-    esmExternals: true,
+    // Keep the local embedding model out of the bundle; load it at runtime.
+    serverComponentsExternalPackages: ['@huggingface/transformers'],
   },
-  webpack: (config, { isServer }) => {
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      fs: false,
-      path: false,
-      crypto: false,
-    };
-    return config;
-  },
-};
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig

@@ -1,57 +1,79 @@
 import axios from 'axios'
+import { createHash } from 'crypto'
+import { serverEnv } from './env'
+import { EMBEDDING_DIM } from './embeddings'
 
-const qdrantUrl = process.env.QDRANT_URL!
-const qdrantApiKey = process.env.QDRANT_API_KEY!
+let _client: ReturnType<typeof axios.create> | null = null
+function client() {
+  if (!_client) {
+    _client = axios.create({
+      baseURL: serverEnv.qdrantUrl,
+      headers: { 'api-key': serverEnv.qdrantApiKey, 'Content-Type': 'application/json' },
+    })
+  }
+  return _client
+}
 
-const qdrantClient = axios.create({
-  baseURL: qdrantUrl,
-  headers: {
-    'api-key': qdrantApiKey,
-    'Content-Type': 'application/json',
-  },
-})
-
-export async function getCollectionName(organizationId: string): Promise<string> {
+export function getCollectionName(organizationId: string): string {
   return `org_${organizationId.replace(/-/g, '_')}`
 }
 
+/**
+ * Deterministic 63-bit point ID derived from document + chunk index, so
+ * re-uploading the same document overwrites its own points instead of colliding
+ * with random IDs from other documents.
+ */
+export function pointId(documentId: string, chunkIndex: number): number {
+  const hash = createHash('sha1').update(`${documentId}:${chunkIndex}`).digest('hex')
+  return parseInt(hash.slice(0, 13), 16) // 52 bits — within Number.MAX_SAFE_INTEGER
+}
+
 export async function createOrganizationCollection(organizationId: string): Promise<void> {
-  const collectionName = await getCollectionName(organizationId)
+  const collectionName = getCollectionName(organizationId)
   try {
-    await qdrantClient.get(`/collections/${collectionName}`)
+    await client().get(`/collections/${collectionName}`)
   } catch {
-    await qdrantClient.put(`/collections/${collectionName}`, {
-      vectors: { size: 1536, distance: 'Cosine' },
+    await client().put(`/collections/${collectionName}`, {
+      vectors: { size: EMBEDDING_DIM, distance: 'Cosine' },
     })
   }
 }
 
-export async function upsertVector(
+export interface VectorPoint {
+  id: number
+  vector: number[]
+  payload: Record<string, unknown>
+}
+
+/** Batch upsert — one network round-trip instead of one per chunk. */
+export async function upsertVectors(
   organizationId: string,
-  pointId: number,
-  vector: number[],
-  payload: Record<string, unknown>,
+  points: VectorPoint[],
 ): Promise<void> {
-  const collectionName = await getCollectionName(organizationId)
-  await qdrantClient.put(`/collections/${collectionName}/points?wait=true`, {
-    points: [{ id: pointId, vector, payload }],
-  })
+  if (points.length === 0) return
+  const collectionName = getCollectionName(organizationId)
+  await client().put(`/collections/${collectionName}/points?wait=true`, { points })
 }
 
 export async function searchVectors(
   organizationId: string,
   query: number[],
-  limit: number = 3,
+  limit = 3,
 ): Promise<Array<{ id: number; score: number; payload: Record<string, unknown> }>> {
-  const collectionName = await getCollectionName(organizationId)
-  const response = await qdrantClient.post(`/collections/${collectionName}/points/search`, {
-    vector: query,
-    limit,
-    with_payload: true,
-  })
-  return (response.data.result || []).map((r: any) => ({
-    id: r.id,
-    score: r.score,
-    payload: r.payload,
-  }))
+  const collectionName = getCollectionName(organizationId)
+  try {
+    const response = await client().post(`/collections/${collectionName}/points/search`, {
+      vector: query,
+      limit,
+      with_payload: true,
+    })
+    return (response.data.result || []).map((r: any) => ({
+      id: r.id,
+      score: r.score,
+      payload: r.payload,
+    }))
+  } catch {
+    // Collection may not exist yet (no documents uploaded) — return no context.
+    return []
+  }
 }

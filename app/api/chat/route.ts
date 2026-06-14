@@ -1,77 +1,100 @@
 export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-server'
+import { requireAuth, AuthError } from '@/lib/auth-helpers'
 import { embedText } from '@/lib/embeddings'
 import { retrieveContext, generateAnswer, deductCredits } from '@/lib/rag'
 import { detectLanguage } from '@/lib/language'
+import { chatSchema } from '@/lib/validation'
+import { rateLimit, clientKey } from '@/lib/rate-limit'
+import { withCors, preflight, corsHeaders } from '@/lib/cors'
+import { allowedWidgetOrigins } from '@/lib/env'
+
+export async function OPTIONS(request: NextRequest) {
+  return preflight(request)
+}
 
 export async function POST(request: NextRequest) {
+  // Per-IP rate limit (cheap abuse protection before any expensive work).
+  const rl = rateLimit(clientKey(request, 'chat'), 20, 60_000)
+  if (!rl.allowed) {
+    return withCors(
+      request,
+      NextResponse.json({ error: 'Rate limit exceeded. Try again shortly.' }, { status: 429 }),
+    )
+  }
+
+  let body: unknown
   try {
-    const { message, organizationId } = await request.json()
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
+  }
 
-    if (!message || !organizationId) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+  const parsed = chatSchema.safeParse(body)
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: parsed.error.issues[0]?.message ?? 'Invalid request' },
+      { status: 400 },
+    )
+  }
+  const { message } = parsed.data
+
+  // Resolve the organization securely:
+  //  - Authenticated dashboard call  -> org derived from the session.
+  //  - Cross-origin widget call       -> org from body, but ONLY if the request
+  //    comes from an allow-listed origin (prevents arbitrary org targeting).
+  let organizationId: string
+  const origin = request.headers.get('origin')
+  const isWidget = !!origin && allowedWidgetOrigins().some((o) => o === '*' || o === origin)
+
+  if (isWidget) {
+    if (!parsed.data.organizationId) {
+      return withCors(
+        request,
+        NextResponse.json({ error: 'organizationId required for widget' }, { status: 400 }),
+      )
     }
-
-    // Check organization exists and has credits
-    const { data: org, error: orgError } = await supabase
-      .from('organizations')
-      .select('credit_balance, subscription_tier')
-      .eq('id', organizationId)
-      .single()
-
-    if (orgError || !org) {
-      return NextResponse.json({ error: 'Organization not found' }, { status: 404 })
+    organizationId = parsed.data.organizationId
+  } else {
+    try {
+      const auth = await requireAuth()
+      organizationId = auth.organizationId
+    } catch (e) {
+      const status = e instanceof AuthError ? e.status : 401
+      return NextResponse.json({ error: 'Authentication required' }, { status })
     }
+  }
 
-    // Check credit balance (enterprise has unlimited)
-    if (org.subscription_tier !== 'enterprise' && org.credit_balance <= 0) {
-      return NextResponse.json({ error: 'Insufficient credits' }, { status: 402 })
-    }
+  const admin = supabaseAdmin()
 
-    // Detect language
+  // Atomic credit check + deduction (1 credit per turn). Blocks at zero.
+  const deduction = await deductCredits(organizationId, 1)
+  if (!deduction.ok) {
+    const status = deduction.reason === 'not_found' ? 404 : 402
+    const error = deduction.reason === 'not_found' ? 'Organization not found' : 'Insufficient credits'
+    return withCors(request, NextResponse.json({ error }, { status }))
+  }
+
+  try {
     const language = detectLanguage(message)
-
-    // Embed the message
     const embedding = await embedText(message)
-
-    // Retrieve context from Qdrant
     const context = await retrieveContext(organizationId, message, embedding)
+    const answer = await generateAnswer(message, context, language)
 
-    // Generate response
-    const response = await generateAnswer(message, context, language)
+    await admin.from('conversations').insert({
+      organization_id: organizationId,
+      user_message: message,
+      ai_response: answer,
+      tokens_used: Math.ceil(answer.length / 4),
+      language,
+    })
 
-    // Save conversation
-    const { data: conversation, error: saveError } = await supabase
-      .from('conversations')
-      .insert({
-        organization_id: organizationId,
-        user_message: message,
-        ai_response: response,
-        tokens_used: Math.ceil(response.length / 4), // Rough token estimate
-        language,
-      })
-      .select()
-      .single()
-
-    if (saveError) {
-      console.error('Error saving conversation:', saveError)
-    }
-
-    // Deduct credits
-    await deductCredits(organizationId, conversation?.tokens_used || 100)
-
-    // Return streaming response
-    const encoder = new TextEncoder()
     const stream = new ReadableStream({
       start(controller) {
         controller.enqueue(
-          encoder.encode(
-            `data: ${JSON.stringify({
-              id: conversation?.id,
-              content: response,
-              tokens_used: conversation?.tokens_used,
-            })}\n\n`,
+          new TextEncoder().encode(
+            `data: ${JSON.stringify({ content: answer, remaining: deduction.remaining })}\n\n`,
           ),
         )
         controller.close()
@@ -82,11 +105,16 @@ export async function POST(request: NextRequest) {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
+        ...corsHeaders(request),
       },
     })
-  } catch (error: any) {
-    console.error('Chat error:', error)
-    return NextResponse.json({ error: error.message || 'Chat failed' }, { status: 500 })
+  } catch (error) {
+    // Refund the credit if generation failed — the user got no answer.
+    await admin.rpc('add_credits', { p_org_id: organizationId, p_amount: 1 })
+    console.error('Chat generation error:', error)
+    return withCors(
+      request,
+      NextResponse.json({ error: 'Failed to generate a response' }, { status: 500 }),
+    )
   }
 }

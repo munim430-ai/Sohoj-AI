@@ -32,7 +32,7 @@ function EmbedWidgetContent() {
     // Load organization branding
     const loadBranding = async () => {
       try {
-        const response = await fetch(`/api/organization?org_id=${organizationId}`)
+        const response = await fetch(`/api/public/branding?org_id=${organizationId}`)
         if (response.ok) {
           const org = await response.json()
           setBranding(org.branding)

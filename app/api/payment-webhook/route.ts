@@ -1,73 +1,39 @@
 export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
-import { processPaymentWebhook } from '@/lib/payment'
+import { verifyAndApply } from '@/lib/payment'
+import { serverEnv } from '@/lib/env'
 
+/**
+ * aamarPay posts the transaction result here on completion. We only read the
+ * transaction id from the callback and then verify everything server-to-server;
+ * amounts and status from the request body are never trusted.
+ */
 export async function POST(request: NextRequest) {
+  let tranId: string | null = null
   try {
-    const { searchParams } = new URL(request.url)
-
-    // aamarPay sends data as query parameters
-    const transactionId = searchParams.get('transactionId')
-    const amount = searchParams.get('amount')
-    const signature = searchParams.get('signature')
-
-    if (!transactionId || !amount || !signature) {
-      return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 })
+    const contentType = request.headers.get('content-type') || ''
+    if (contentType.includes('application/json')) {
+      const body = await request.json()
+      tranId = body.mer_txnid || body.tran_id || null
+    } else {
+      const form = await request.formData()
+      tranId = (form.get('mer_txnid') as string) || (form.get('tran_id') as string) || null
     }
-
-    const result = await processPaymentWebhook({
-      transactionId,
-      amount,
-      signature,
-    })
-
-    if (!result.success) {
-      return NextResponse.json({ error: 'Payment processing failed' }, { status: 400 })
-    }
-
-    // Redirect to success page
-    return NextResponse.redirect(new URL('/billing?success=true', request.url))
-  } catch (error: any) {
-    console.error('Payment webhook error:', error)
-    return NextResponse.redirect(new URL('/billing?error=' + encodeURIComponent(error.message), request.url))
+  } catch {
+    tranId = null
   }
-}
 
-export async function GET(request: NextRequest) {
+  const base = serverEnv.appUrl
+  if (!tranId) {
+    return NextResponse.redirect(new URL('/billing?status=error', base), 303)
+  }
+
   try {
-    const { searchParams } = new URL(request.url)
-
-    // aamarPay sends data as query parameters
-    const transactionId = searchParams.get('transactionId')
-    const amount = searchParams.get('amount')
-    const signature = searchParams.get('signature')
-    const status = searchParams.get('status')
-
-    if (status === 'failed') {
-      return NextResponse.redirect(new URL('/billing?error=Payment failed', request.url))
-    }
-
-    if (status === 'cancelled') {
-      return NextResponse.redirect(new URL('/billing?cancelled=true', request.url))
-    }
-
-    if (!transactionId || !amount || !signature) {
-      return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 })
-    }
-
-    const result = await processPaymentWebhook({
-      transactionId,
-      amount,
-      signature,
-    })
-
-    if (!result.success) {
-      return NextResponse.redirect(new URL('/billing?error=Payment verification failed', request.url))
-    }
-
-    return NextResponse.redirect(new URL('/billing?success=true', request.url))
-  } catch (error: any) {
+    const result = await verifyAndApply(tranId)
+    const status = result.ok ? 'success' : 'failed'
+    return NextResponse.redirect(new URL(`/billing?status=${status}`, base), 303)
+  } catch (error) {
     console.error('Payment webhook error:', error)
-    return NextResponse.redirect(new URL('/billing?error=' + encodeURIComponent(error.message), request.url))
+    return NextResponse.redirect(new URL('/billing?status=error', base), 303)
   }
 }
