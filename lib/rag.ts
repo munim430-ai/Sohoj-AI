@@ -3,7 +3,7 @@ import { searchVectors } from './qdrant-server'
 import { supabase } from './supabase'
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY || 'placeholder-openai-key',
 })
 
 export interface RAGContext {
