@@ -1,0 +1,41 @@
+{
+  "name": "shahojAI",
+  "version": "1.0.0",
+  "description": "AI Customer Support Agent for Bangladeshi e-commerce sellers",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "db:migrate": "node scripts/migrate.js",
+    "qdrant:init": "node scripts/qdrant-init.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.4",
+    "@vercel/ai": "^4.0.0",
+    "openai": "^4.52.7",
+    "axios": "^1.6.2",
+    "cheerio": "^1.0.0-rc.12",
+    "csv-parser": "^3.0.0",
+    "franc": "^7.1.0",
+    "langdetect": "^0.2.0",
+    "next": "14.1.0",
+    "pdfjs-dist": "^4.0.379",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "qdrant-js": "^1.9.1",
+    "zustand": "^4.4.5",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.3.3"
+  }
+}

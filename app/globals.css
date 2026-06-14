@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #3b82f6;
+  --secondary: #1f2937;
+  --success: #10b981;
+  --error: #ef4444;
+  --warning: #f59e0b;
+}
+
+* {
+  @apply border-gray-200;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-white text-gray-900;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    @apply bg-gray-950 text-gray-50;
+  }
+
+  * {
+    @apply border-gray-800;
+  }
+}
+
+.prose {
+  @apply max-w-none;
+}
+
+.prose-code {
+  @apply px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-sm;
+}
