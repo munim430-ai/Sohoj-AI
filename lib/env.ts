@@ -58,6 +58,16 @@ export const serverEnv = {
   get llmModel() {
     return optional('LLM_MODEL', 'llama-3.3-70b-versatile')
   },
+  // Embeddings — Jina free tier by default (OpenAI-compatible response shape).
+  get embeddingsApiUrl() {
+    return optional('EMBEDDINGS_API_URL', 'https://api.jina.ai/v1/embeddings')
+  },
+  get embeddingsApiKey() {
+    return required('EMBEDDINGS_API_KEY')
+  },
+  get embeddingsModel() {
+    return optional('EMBEDDINGS_MODEL', 'jina-embeddings-v2-base-en')
+  },
   get aamarpayStoreId() {
     return required('AAMARPAY_STORE_ID')
   },

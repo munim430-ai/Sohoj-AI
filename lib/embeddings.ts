@@ -1,42 +1,46 @@
 /**
- * Local sentence embeddings — the cheapest possible route.
+ * Embeddings via a lightweight HTTP call — keeps the serverless bundle small
+ * (no native onnxruntime) while staying on a free tier.
  *
- * Uses `all-MiniLM-L6-v2` (384-dim) running in-process via
- * @huggingface/transformers. No API key, no per-token cost. The model is
- * downloaded once and cached on disk, then loaded lazily as a singleton.
+ * Default provider: Jina AI (free tier, no card) — `jina-embeddings-v2-base-en`,
+ * 768 dimensions. The request/response shape is OpenAI-compatible, so any
+ * OpenAI-style embeddings endpoint works by overriding EMBEDDINGS_API_URL/MODEL.
  */
-import { pipeline } from '@huggingface/transformers'
+import { serverEnv } from './env'
 
-export const EMBEDDING_DIM = 384
-const MODEL = 'Xenova/all-MiniLM-L6-v2'
+export const EMBEDDING_DIM = Number(process.env.EMBEDDING_DIM || 768)
 
-// The pipeline() overload union is too large for tsc to represent, so the
-// extractor is intentionally typed loosely.
-let extractorPromise: Promise<any> | null = null
+async function callApi(input: string[]): Promise<number[][]> {
+  const res = await fetch(serverEnv.embeddingsApiUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${serverEnv.embeddingsApiKey}`,
+    },
+    body: JSON.stringify({ model: serverEnv.embeddingsModel, input }),
+  })
 
-function getExtractor(): Promise<any> {
-  if (!extractorPromise) {
-    extractorPromise = (pipeline as any)('feature-extraction', MODEL)
+  if (!res.ok) {
+    const detail = await res.text().catch(() => '')
+    throw new Error(`Embeddings API error ${res.status}: ${detail.slice(0, 200)}`)
   }
-  return extractorPromise!
+
+  const json = (await res.json()) as { data: Array<{ embedding: number[] }> }
+  return json.data.map((d) => d.embedding)
 }
 
 export async function embedText(text: string): Promise<number[]> {
-  const extractor = await getExtractor()
-  const output = await extractor(text, { pooling: 'mean', normalize: true })
-  return Array.from(output.data as Float32Array)
+  const [embedding] = await callApi([text])
+  return embedding
 }
 
 export async function embedBatch(texts: string[]): Promise<number[][]> {
   if (texts.length === 0) return []
-  const extractor = await getExtractor()
-  const output = await extractor(texts, { pooling: 'mean', normalize: true })
-  // The pipeline returns a [n, dim] tensor flattened in output.data.
-  const data = output.data as Float32Array
-  const dim = output.dims[output.dims.length - 1]
-  const result: number[][] = []
-  for (let i = 0; i < texts.length; i++) {
-    result.push(Array.from(data.slice(i * dim, (i + 1) * dim)))
+  // Most providers cap batch size; chunk to stay safe and cheap.
+  const BATCH = 64
+  const out: number[][] = []
+  for (let i = 0; i < texts.length; i += BATCH) {
+    out.push(...(await callApi(texts.slice(i, i + BATCH))))
   }
-  return result
+  return out
 }

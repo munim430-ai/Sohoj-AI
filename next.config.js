@@ -5,10 +5,6 @@ const nextConfig = {
   images: {
     remotePatterns: [{ protocol: 'https', hostname: '**' }],
   },
-  experimental: {
-    // Keep the local embedding model out of the bundle; load it at runtime.
-    serverComponentsExternalPackages: ['@huggingface/transformers'],
-  },
 }
 
 module.exports = nextConfig
