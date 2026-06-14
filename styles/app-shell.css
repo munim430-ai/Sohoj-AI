@@ -1,0 +1,238 @@
+/* Authenticated app shell — shared top bar + content surface. */
+
+.app-bar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid #ececec;
+}
+
+.app-bar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 60px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.app-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  color: #000;
+  text-decoration: none;
+}
+.app-brand-ai {
+  color: #1a73e8;
+}
+
+.app-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: auto;
+}
+.app-nav-link {
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b6b6b;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+.app-nav-link:hover {
+  color: #000;
+  background: #f5f5f5;
+}
+.app-nav-link.is-active {
+  color: #000;
+  background: #f0f0f0;
+}
+
+.app-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-credit-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border: 1px solid #e6e6e6;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #111;
+  text-decoration: none;
+  background: #fff;
+}
+.app-credit-unit {
+  color: #9a9a9a;
+  font-weight: 500;
+}
+.app-credit-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #34a853;
+}
+
+.app-signout {
+  padding: 7px 14px;
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  color: #111;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.app-signout:hover {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+.app-burger {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.app-burger span {
+  width: 20px;
+  height: 2px;
+  background: #000;
+  border-radius: 2px;
+}
+
+.app-nav-mobile {
+  display: none;
+}
+
+/* Content surface */
+.app-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+}
+
+.app-page-head {
+  margin-bottom: 32px;
+}
+.app-page-title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #000;
+  margin: 0 0 6px;
+}
+.app-page-sub {
+  font-size: 15px;
+  color: #6b6b6b;
+  margin: 0;
+}
+
+/* Reusable cards */
+.app-grid {
+  display: grid;
+  gap: 16px;
+}
+.app-card {
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  padding: 22px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.app-card:hover {
+  border-color: #dcdcdc;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+}
+.app-stat-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #9a9a9a;
+  margin: 0;
+}
+.app-stat-value {
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #000;
+  margin: 10px 0 4px;
+}
+.app-stat-hint {
+  font-size: 12px;
+  color: #bdbdbd;
+  margin: 0;
+}
+
+.app-action {
+  display: block;
+  padding: 18px;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.15s ease;
+}
+.app-action:hover {
+  border-color: #000;
+  transform: translateY(-1px);
+}
+.app-action-title {
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 4px;
+}
+.app-action-sub {
+  font-size: 13px;
+  color: #6b6b6b;
+  margin: 0;
+}
+
+@media (max-width: 820px) {
+  .app-nav,
+  .app-credit-pill .app-credit-unit {
+    display: none;
+  }
+  .app-burger {
+    display: flex;
+  }
+  .app-signout {
+    display: none;
+  }
+  .app-bar-right .app-signout {
+    display: none;
+  }
+  .app-nav-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 24px 18px;
+    border-top: 1px solid #ececec;
+    background: #fff;
+  }
+  .app-nav-mobile .app-signout {
+    display: inline-block;
+    margin-top: 8px;
+    width: fit-content;
+  }
+}

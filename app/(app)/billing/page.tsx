@@ -108,15 +108,8 @@ export default function BillingPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Billing & Plans</h1>
-          </div>
-        </div>
-      </nav>
-
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Billing &amp; Plans</h1>
         {organization && (
           <>
             <div className="mb-12 bg-white dark:bg-gray-900 rounded-lg shadow p-6">
