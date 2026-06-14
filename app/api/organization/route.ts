@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase, supabaseAdmin } from '@/lib/supabase'
-import { createOrganizationCollection } from '@/lib/qdrant'
+import { createOrganizationCollection } from '@/lib/qdrant-server'
 
 export async function POST(request: NextRequest) {
   try {

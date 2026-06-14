@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import { embedBatch } from '@/lib/embeddings'
-import { createOrganizationCollection, upsertVector } from '@/lib/qdrant'
+import { createOrganizationCollection, upsertVector } from '@/lib/qdrant-server'
 import { createReadStream } from 'fs'
 import { parse } from 'csv-parse/sync'
 import * as pdfjsLib from 'pdfjs-dist'

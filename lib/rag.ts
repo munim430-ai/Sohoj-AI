@@ -1,5 +1,5 @@
 import { OpenAI } from 'openai'
-import { searchVectors } from './qdrant'
+import { searchVectors } from './qdrant-server'
 import { supabase } from './supabase'
 
 const openai = new OpenAI({

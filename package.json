@@ -14,20 +14,13 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.4",
-    "@vercel/ai": "^4.0.0",
     "openai": "^4.52.7",
     "axios": "^1.6.2",
-    "cheerio": "^1.0.0-rc.12",
-    "csv-parser": "^3.0.0",
-    "franc": "^7.1.0",
-    "langdetect": "^0.2.0",
+    "csv-parse": "^5.4.1",
     "next": "14.1.0",
     "pdfjs-dist": "^4.0.379",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "qdrant-js": "^1.9.1",
-    "zustand": "^4.4.5",
-    "zod": "^3.22.4"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/node": "^20.10.5",

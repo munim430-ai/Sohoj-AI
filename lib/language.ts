@@ -1,9 +1,12 @@
-import { detect } from 'franc'
-
 export function detectLanguage(text: string): 'en' | 'bn' {
-  const detectedLang = detect(text, { only: ['en', 'ben'] })
+  // Simple Bengali detection based on Unicode ranges
+  // Bengali characters: U+0980 to U+09FF
+  const bengaliRegex = /[ঀ-৿]/g
+  const bengaliChars = (text.match(bengaliRegex) || []).length
+  const totalChars = text.length
 
-  if (detectedLang === 'ben') {
+  // If more than 20% of characters are Bengali, classify as Bengali
+  if (bengaliChars / totalChars > 0.2) {
     return 'bn'
   }
   return 'en'
