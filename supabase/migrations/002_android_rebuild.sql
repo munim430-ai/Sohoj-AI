@@ -43,6 +43,20 @@ do $$ begin
   create type txn_source as enum ('notification', 'sms_share', 'manual_paste');
 exception when duplicate_object then null; end $$;
 
+-- ── organization_members (membership + role; replaces POC `users`) ───────────
+create table if not exists organization_members (
+  id              uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references organizations(id) on delete cascade,
+  auth_id         uuid not null references auth.users(id) on delete cascade,
+  email           text not null,
+  role            member_role not null default 'staff',
+  created_at      timestamptz not null default now(),
+  updated_at      timestamptz not null default now(),
+  unique (organization_id, auth_id)
+);
+create index if not exists idx_org_members_org on organization_members(organization_id);
+create index if not exists idx_org_members_auth on organization_members(auth_id);
+
 -- ── Helper: org ids the current auth user belongs to (SECURITY DEFINER avoids
 --    recursive RLS evaluation on organization_members) ─────────────────────────
 create or replace function auth_org_ids()
@@ -59,20 +73,6 @@ language sql stable security definer set search_path = public as $$
     where auth_id = auth.uid() and organization_id = target_org and role = any(roles)
   )
 $$;
-
--- ── organization_members (membership + role; replaces POC `users`) ───────────
-create table if not exists organization_members (
-  id              uuid primary key default gen_random_uuid(),
-  organization_id uuid not null references organizations(id) on delete cascade,
-  auth_id         uuid not null references auth.users(id) on delete cascade,
-  email           text not null,
-  role            member_role not null default 'staff',
-  created_at      timestamptz not null default now(),
-  updated_at      timestamptz not null default now(),
-  unique (organization_id, auth_id)
-);
-create index if not exists idx_org_members_org on organization_members(organization_id);
-create index if not exists idx_org_members_auth on organization_members(auth_id);
 
 -- ── subscriptions (Free / Basic ৳1,999 / Pro ৳4,999; no annual plans) ────────
 create table if not exists subscriptions (
