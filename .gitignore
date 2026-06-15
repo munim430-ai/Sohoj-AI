@@ -41,3 +41,13 @@ yarn-error.log*
 
 # Vercel
 .vercel
+
+# Android — secrets, signing, build output (never commit)
+apps/android/secrets.properties
+apps/android/keystore.properties
+apps/android/local.properties
+*.keystore
+*.jks
+apps/android/**/build/
+apps/android/.gradle/
+.gradle/
