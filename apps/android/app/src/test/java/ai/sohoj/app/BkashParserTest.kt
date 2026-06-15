@@ -47,4 +47,36 @@ class BkashParserTest {
     @Test fun ignoresUnrelated() {
         assertNull(BkashParser.parse("Congratulations! You won a free recharge."))
     }
+
+    // Inferred formats (fixtures/assumptions until confirmed by real samples).
+    @Test fun cashOut() {
+        val p = BkashParser.parse(
+            "Cash Out Tk 1,000.00 to 01890000000 successful. Fee Tk 18.50. Balance Tk 500.00. TrxID AB12CD34EF at 10/06/2026 09:00"
+        )!!
+        assertEquals(TxnType.CASH_OUT, p.type)
+        assertEquals(BigDecimal("18.50"), p.fee)
+        assertEquals(Confidence.LOW, p.confidence)
+    }
+
+    @Test fun sendMoneySent() {
+        val p = BkashParser.parse(
+            "Send Money Tk 750.00 to 01711111111 successful. Fee Tk 5.00. Balance Tk 250.00. TrxID ZZ99YY88XX at 10/06/2026 10:00"
+        )!!
+        assertEquals(TxnType.SEND_MONEY_SENT, p.type)
+        assertEquals(BigDecimal("750.00"), p.amount)
+    }
+
+    @Test fun chargeFee() {
+        val p = BkashParser.parse(
+            "Tk 5.00 deducted as charge. Balance Tk 995.00. TrxID CH123456 at 10/06/2026 11:00"
+        )!!
+        assertEquals(TxnType.CHARGE, p.type)
+        assertEquals(BigDecimal("5.00"), p.fee)
+    }
+
+    @Test fun balanceOnly() {
+        val p = BkashParser.parse("Your bKash account balance is Tk 1,234.56 at 10/06/2026 12:00")!!
+        assertEquals(TxnType.BALANCE_UPDATE, p.type)
+        assertEquals(BigDecimal("1234.56"), p.balanceAfter)
+    }
 }

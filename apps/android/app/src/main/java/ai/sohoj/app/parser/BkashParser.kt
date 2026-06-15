@@ -55,6 +55,14 @@ object BkashParser {
         Rule(Regex("""(?:Send Money|You have sent) Tk $AMT to $PARTY\.? (?:is )?successful\.? Fee Tk $AMT\. Balance Tk $AMT\. TrxID $ID at $DT""")) { m ->
             tx(TxnType.SEND_MONEY_SENT, m[1], m[3], m[4], m[2], m[5], m[6], Confidence.LOW)
         },
+        // Standalone charge/fee (FIXTURE/ASSUMPTION — confirm with a real sample).
+        Rule(Regex("""Tk $AMT (?:charged|deducted as charge)[^.]*\. Balance Tk $AMT\. TrxID $ID at $DT""")) { m ->
+            ParsedTransaction(TxnType.CHARGE, amount("0"), amount(m[1]), amount(m[2]), null, m[3], dt(m[4]), Confidence.LOW)
+        },
+        // Balance-only alert (FIXTURE/ASSUMPTION — confirm with a real sample).
+        Rule(Regex("""(?:Your bKash )?(?:account )?[Bb]alance is Tk $AMT at $DT""")) { m ->
+            ParsedTransaction(TxnType.BALANCE_UPDATE, amount("0"), amount("0"), amount(m[1]), null, null, dt(m[2]), Confidence.LOW)
+        },
     )
 
     fun parse(message: String): ParsedTransaction? {
@@ -72,6 +80,8 @@ object BkashParser {
     private operator fun MatchResult.get(i: Int): String = groupValues[i]
 
     private fun amount(raw: String): BigDecimal = BigDecimal(raw.replace(",", ""))
+
+    private fun dt(s: String): LocalDateTime? = runCatching { LocalDateTime.parse(s, DATE_FMT) }.getOrNull()
 
     private fun maskParty(p: String): String =
         if (p.length >= 7 && p.all { it.isDigit() }) "${p.take(3)}****${p.takeLast(3)}" else p
