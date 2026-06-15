@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 interface Message {
@@ -16,7 +16,7 @@ interface OrgBranding {
   show_powered_by: boolean
 }
 
-export default function EmbedWidget() {
+function EmbedWidgetContent() {
   const searchParams = useSearchParams()
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
@@ -313,5 +313,13 @@ export default function EmbedWidget() {
         }
       `}</style>
     </div>
+  )
+}
+
+export default function EmbedWidget() {
+  return (
+    <Suspense fallback={null}>
+      <EmbedWidgetContent />
+    </Suspense>
   )
 }

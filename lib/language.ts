@@ -1,7 +1,8 @@
-import { detect } from 'franc'
+import { franc } from 'franc'
 
 export function detectLanguage(text: string): 'en' | 'bn' {
-  const detectedLang = detect(text, { only: ['en', 'ben'] })
+  // franc uses ISO 639-3 codes ('eng', 'ben') and returns a single best match.
+  const detectedLang = franc(text, { only: ['eng', 'ben'] })
 
   if (detectedLang === 'ben') {
     return 'bn'

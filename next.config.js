@@ -12,6 +12,7 @@ const nextConfig = {
   },
   experimental: {
     esmExternals: true,
+    serverComponentsExternalPackages: ['@qdrant/js-client-rest', 'pdfjs-dist'],
   },
   webpack: (config, { isServer }) => {
     config.resolve.fallback = {

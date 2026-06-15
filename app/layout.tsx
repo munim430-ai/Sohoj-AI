@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'ShahojAI - Customer Support Agent',
-  description: 'AI-powered customer support for Bangladeshi e-commerce sellers',
+  title: 'sohojAI — We talk. You sell.',
+  description: 'AI customer support for Bangladeshi Facebook & F-commerce sellers',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
