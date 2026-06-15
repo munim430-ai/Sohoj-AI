@@ -10,6 +10,10 @@ const instrumentSerif = Instrument_Serif({
   style: ['normal', 'italic'],
   variable: '--font-instrument-serif',
   display: 'swap',
+  // Instrument Serif has no metrics for an automatic fallback; disabling avoids
+  // the "Failed to find font override values" build warning.
+  adjustFontFallback: false,
+  fallback: ['Georgia', 'serif'],
 })
 
 const inter = Inter({
