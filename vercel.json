@@ -4,19 +4,6 @@
   "framework": "nextjs",
   "cleanUrls": true,
   "trailingSlash": false,
-  "env": [
-    "NEXT_PUBLIC_SUPABASE_URL",
-    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-    "SUPABASE_SERVICE_ROLE_KEY",
-    "QDRANT_URL",
-    "QDRANT_API_KEY",
-    "OPENAI_API_KEY",
-    "AAMARPAY_STORE_ID",
-    "AAMARPAY_SIGNATURE_KEY",
-    "AAMARPAY_SANDBOX",
-    "NEXT_PUBLIC_APP_URL",
-    "NEXT_PUBLIC_WIDGET_URL"
-  ],
   "headers": [
     {
       "source": "/api/(.*)",
