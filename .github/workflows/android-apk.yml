@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -69,3 +69,18 @@ jobs:
             apps/android/app/build/outputs/apk/release/SHA256SUMS.txt
           if-no-files-found: error
           retention-days: 30
+
+      - name: Publish Beta v0.1 release (on success)
+        if: ${{ success() && github.ref == 'refs/heads/production/android-production' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: beta-v0.1
+          name: Beta v0.1
+          prerelease: true
+          fail_on_unmatched_files: true
+          body: |
+            Automated beta build from `production/android-production`.
+            Attached: release APK + `SHA256SUMS.txt`. Verify with `sha256sum -c SHA256SUMS.txt`.
+          files: |
+            apps/android/app/build/outputs/apk/release/*.apk
+            apps/android/app/build/outputs/apk/release/SHA256SUMS.txt
