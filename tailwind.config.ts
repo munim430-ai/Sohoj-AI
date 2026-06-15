@@ -8,26 +8,41 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: 'var(--primary)',
-        secondary: 'var(--secondary)',
-        // sohojAI brand palette
-        electric: '#274DFE', // Electric Flow Blue — primary
-        navy: '#1A1D54', // Deep Tech Navy — text / deep backgrounds
-        azure: '#518CFF', // Azure Highlight — hover / accents
-        slate: '#F8FAFC', // Clean Slate — backgrounds / cards
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
+        primary: {
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
+        },
+        secondary: {
+          DEFAULT: 'hsl(var(--secondary))',
+          foreground: 'hsl(var(--secondary-foreground))',
+        },
+        muted: {
+          DEFAULT: 'hsl(var(--muted))',
+          foreground: 'hsl(var(--muted-foreground))',
+        },
+        accent: {
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))',
+        },
+        border: 'hsl(var(--border))',
+        ring: 'hsl(var(--ring))',
       },
       fontFamily: {
-        display: ['var(--font-poppins)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-instrument-serif)', 'Georgia', 'serif'],
+        body: ['var(--font-inter)', 'system-ui', 'sans-serif'],
         sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
         bangla: ['var(--font-hind)', 'var(--font-inter)', 'sans-serif'],
       },
-      boxShadow: {
-        soft: '0 10px 40px -12px rgba(26, 29, 84, 0.12)',
-        card: '0 8px 30px -10px rgba(26, 29, 84, 0.15)',
-        glow: '0 20px 60px -15px rgba(39, 77, 254, 0.45)',
-      },
       borderRadius: {
-        '4xl': '2rem',
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)',
+      },
+      boxShadow: {
+        dashboard: 'var(--shadow-dashboard)',
+        soft: '0 10px 40px -12px rgba(0, 0, 0, 0.08)',
       },
       keyframes: {
         marquee: {
@@ -38,16 +53,10 @@ const config: Config = {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-10px)' },
         },
-        'pulse-ring': {
-          '0%': { transform: 'scale(0.8)', opacity: '0.55' },
-          '100%': { transform: 'scale(2.2)', opacity: '0' },
-        },
       },
       animation: {
-        pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        marquee: 'marquee 28s linear infinite',
+        marquee: 'marquee 32s linear infinite',
         float: 'float 6s ease-in-out infinite',
-        'pulse-ring': 'pulse-ring 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
     },
   },

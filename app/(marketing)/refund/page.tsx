@@ -66,7 +66,7 @@ export default function RefundPage() {
           body: (
             <p>
               For any billing or refund question, email{' '}
-              <a href="mailto:munimm247@gmail.com" className="font-medium text-electric">
+              <a href="mailto:munimm247@gmail.com" className="font-medium text-accent">
                 munimm247@gmail.com
               </a>{' '}
               with your account details and we’ll help.

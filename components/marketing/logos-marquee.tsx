@@ -18,9 +18,9 @@ const integrations = [
 
 export function LogosMarquee() {
   return (
-    <section className="border-y border-navy/5 bg-white/60 py-10">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-navy/40">
+    <section className="border-y border-border bg-background py-10">
+      <div className="mx-auto max-w-7xl px-6">
+        <p className="text-center text-xs uppercase tracking-[0.2em] text-muted-foreground">
           Works with the tools your business already runs on
         </p>
 
@@ -29,10 +29,10 @@ export function LogosMarquee() {
             {[...integrations, ...integrations].map(({ name, Icon }, i) => (
               <div
                 key={`${name}-${i}`}
-                className="flex shrink-0 items-center gap-2.5 text-navy/45"
+                className="flex shrink-0 items-center gap-2.5 text-muted-foreground"
               >
-                <Icon width={26} height={26} />
-                <span className="font-display text-lg font-semibold">{name}</span>
+                <Icon width={24} height={24} />
+                <span className="text-lg font-medium">{name}</span>
               </div>
             ))}
           </div>

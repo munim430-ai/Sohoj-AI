@@ -2,7 +2,6 @@ import { Hero } from '@/components/marketing/hero'
 import { LogosMarquee } from '@/components/marketing/logos-marquee'
 import { Pillars } from '@/components/marketing/pillars'
 import { HowItWorks } from '@/components/marketing/how-it-works'
-import { ProductShowcase } from '@/components/marketing/product-mockups'
 import { Pricing } from '@/components/marketing/pricing'
 import { Testimonials } from '@/components/marketing/testimonials'
 import { FinalCta } from '@/components/marketing/final-cta'
@@ -14,7 +13,6 @@ export default function HomePage() {
       <LogosMarquee />
       <Pillars />
       <HowItWorks />
-      <ProductShowcase />
       <Pricing />
       <Testimonials />
       <FinalCta />

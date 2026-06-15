@@ -4,22 +4,25 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-display font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-electric/40 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-body font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
         primary:
-          'bg-electric text-white shadow-glow hover:bg-azure hover:-translate-y-0.5 active:translate-y-0',
+          'bg-primary text-primary-foreground hover:bg-primary/90 hover:-translate-y-px active:translate-y-0',
+        accent:
+          'bg-accent text-accent-foreground hover:bg-accent/90 hover:-translate-y-px active:translate-y-0',
         secondary:
-          'bg-white text-navy border border-navy/10 shadow-soft hover:border-electric/30 hover:text-electric hover:-translate-y-0.5',
-        ghost: 'bg-transparent text-navy hover:bg-navy/5',
-        outline:
-          'border border-electric/30 text-electric bg-transparent hover:bg-electric/5',
+          'bg-background text-foreground border border-border hover:bg-secondary',
+        ghost:
+          'bg-background text-foreground border-0 shadow-[0_2px_12px_rgba(0,0,0,0.08)] hover:bg-background/80',
+        link: 'bg-transparent text-muted-foreground hover:text-foreground',
       },
       size: {
         sm: 'h-9 px-4 text-sm',
         md: 'h-11 px-6 text-sm',
-        lg: 'h-14 px-8 text-base',
+        lg: 'h-12 px-7 text-sm',
+        icon: 'h-11 w-11',
       },
     },
     defaultVariants: { variant: 'primary', size: 'md' },

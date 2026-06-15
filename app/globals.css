@@ -3,15 +3,30 @@
 @tailwind utilities;
 
 :root {
-  --primary: #3b82f6;
-  --secondary: #1f2937;
-  --success: #10b981;
-  --error: #ef4444;
-  --warning: #f59e0b;
+  --background: 0 0% 100%;
+  --foreground: 210 14% 17%;
+
+  --primary: 210 14% 17%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 0 0% 96%;
+  --secondary-foreground: 0 0% 9%;
+
+  --muted: 0 0% 96%;
+  --muted-foreground: 184 5% 55%;
+
+  --accent: 239 84% 67%;
+  --accent-foreground: 0 0% 100%;
+
+  --border: 0 0% 90%;
+  --ring: 239 84% 67%;
+
+  --radius: 0.5rem;
+  --shadow-dashboard: 0 25px 80px -12px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.06);
 }
 
 * {
-  @apply border-gray-200;
+  @apply border-border;
 }
 
 html {
@@ -19,17 +34,7 @@ html {
 }
 
 body {
-  @apply bg-white text-gray-900;
-}
-
-@media (prefers-color-scheme: dark) {
-  body {
-    @apply bg-gray-950 text-gray-50;
-  }
-
-  * {
-    @apply border-gray-800;
-  }
+  @apply bg-background text-foreground;
 }
 
 .prose {
@@ -37,5 +42,5 @@ body {
 }
 
 .prose-code {
-  @apply px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-sm;
+  @apply px-2 py-1 rounded bg-secondary text-sm;
 }

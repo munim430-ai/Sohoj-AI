@@ -23,19 +23,18 @@ const socials = [
 
 export function MarketingFooter() {
   return (
-    <footer className="border-t border-navy/10 bg-white">
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
+    <footer className="border-t border-border bg-background">
+      <div className="mx-auto max-w-7xl px-6 py-14">
         <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
             <Logo className="h-8" />
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-navy/60">
-              AI customer support for Bangladeshi Facebook &amp; F-commerce sellers.
-              We talk. You sell.
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
+              AI customer support for Bangladeshi Facebook &amp; F-commerce sellers. We talk. You sell.
             </p>
-            <p className="mt-5 text-sm text-navy/60">
+            <p className="mt-5 text-sm text-muted-foreground">
               <a
                 href="mailto:munimm247@gmail.com"
-                className="font-medium text-navy hover:text-electric"
+                className="font-medium text-foreground hover:text-accent"
               >
                 munimm247@gmail.com
               </a>
@@ -49,7 +48,7 @@ export function MarketingFooter() {
           <FooterCol title="Social" links={socials} />
         </div>
 
-        <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-navy/10 pt-6 text-sm text-navy/50 sm:flex-row sm:items-center">
+        <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-border pt-6 text-sm text-muted-foreground sm:flex-row sm:items-center">
           <p>© {new Date().getFullYear()} sohojAI. Operated by Keystone Consultancy.</p>
           <p>Built for Bangladeshi sellers 🇧🇩</p>
         </div>
@@ -67,13 +66,13 @@ function FooterCol({
 }) {
   return (
     <div>
-      <h4 className="font-display text-sm font-semibold text-navy">{title}</h4>
+      <h4 className="text-sm font-semibold text-foreground">{title}</h4>
       <ul className="mt-4 space-y-3">
         {links.map((l) => (
           <li key={l.label}>
             <Link
               href={l.href}
-              className="text-sm text-navy/60 transition-colors hover:text-electric"
+              className="text-sm text-muted-foreground transition-colors hover:text-accent"
             >
               {l.label}
             </Link>

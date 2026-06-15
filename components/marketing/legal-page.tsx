@@ -14,34 +14,32 @@ export function LegalPage({
   sections: LegalSection[]
 }) {
   return (
-    <article className="mx-auto max-w-3xl px-4 pb-24 pt-32 sm:px-6">
+    <article className="mx-auto max-w-3xl px-6 pb-24 pt-36">
       <div className="mb-8 rounded-2xl border border-amber-300/50 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-        <strong className="font-semibold">DRAFT — pending legal review.</strong> This
-        document is placeholder boilerplate and is not yet legally binding.
+        <strong className="font-semibold">DRAFT — pending legal review.</strong> This document is
+        placeholder boilerplate and is not yet legally binding.
       </div>
 
-      <h1 className="font-display text-4xl font-extrabold tracking-tight text-navy sm:text-5xl">
-        {title}
-      </h1>
-      <p className="mt-3 text-sm text-navy/45">Last updated: {updated}</p>
-      <p className="mt-6 text-lg leading-relaxed text-navy/65">{intro}</p>
+      <h1 className="font-display text-5xl tracking-tight text-foreground sm:text-6xl">{title}</h1>
+      <p className="mt-3 text-sm text-muted-foreground">Last updated: {updated}</p>
+      <p className="mt-6 text-lg leading-relaxed text-muted-foreground">{intro}</p>
 
       <div className="mt-10 space-y-8">
         {sections.map((s, i) => (
           <section key={s.heading}>
-            <h2 className="font-display text-xl font-semibold text-navy">
+            <h2 className="font-display text-2xl tracking-tight text-foreground">
               {i + 1}. {s.heading}
             </h2>
-            <div className="mt-3 space-y-3 leading-relaxed text-navy/65">{s.body}</div>
+            <div className="mt-3 space-y-3 leading-relaxed text-muted-foreground">{s.body}</div>
           </section>
         ))}
       </div>
 
-      <div className="mt-12 rounded-2xl border border-navy/10 bg-white p-6 text-sm text-navy/65">
-        <p className="font-display font-semibold text-navy">Questions?</p>
+      <div className="mt-12 rounded-2xl border border-border bg-secondary/40 p-6 text-sm text-muted-foreground">
+        <p className="font-semibold text-foreground">Questions?</p>
         <p className="mt-2">
           Contact us at{' '}
-          <a href="mailto:munimm247@gmail.com" className="font-medium text-electric">
+          <a href="mailto:munimm247@gmail.com" className="font-medium text-accent">
             munimm247@gmail.com
           </a>
           . sohojAI is operated by Keystone Consultancy, Dhaka, Bangladesh.

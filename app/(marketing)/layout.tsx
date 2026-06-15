@@ -1,13 +1,14 @@
 import type { Metadata } from 'next'
-import { Poppins, Inter, Hind_Siliguri } from 'next/font/google'
+import { Instrument_Serif, Inter, Hind_Siliguri } from 'next/font/google'
 import { cn } from '@/lib/utils'
 import { MarketingNav } from '@/components/marketing/nav'
 import { MarketingFooter } from '@/components/marketing/footer'
 
-const poppins = Poppins({
+const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
-  weight: ['500', '600', '700', '800'],
-  variable: '--font-poppins',
+  weight: ['400'],
+  style: ['normal', 'italic'],
+  variable: '--font-instrument-serif',
   display: 'swap',
 })
 
@@ -53,10 +54,10 @@ export default function MarketingLayout({
   return (
     <div
       className={cn(
-        poppins.variable,
+        instrumentSerif.variable,
         inter.variable,
         hindSiliguri.variable,
-        'min-h-screen bg-slate font-sans text-navy antialiased selection:bg-electric/15'
+        'min-h-screen bg-background font-body text-foreground antialiased selection:bg-accent/15'
       )}
     >
       <MarketingNav />

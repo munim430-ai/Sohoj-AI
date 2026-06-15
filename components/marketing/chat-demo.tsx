@@ -2,8 +2,9 @@
 
 import * as React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { CheckIcon, BkashMark, MessengerMark } from '@/components/marketing/icons'
+import { BkashMark, MessengerMark } from '@/components/marketing/icons'
 
 type Item =
   | { kind: 'msg'; side: 'in' | 'out'; text: string; bangla?: boolean; readMs: number; typeMs?: number }
@@ -90,31 +91,26 @@ export function ChatDemo({ className }: { className?: string }) {
 
   return (
     <div className={cn('relative mx-auto w-full max-w-[320px]', className)}>
-      {/* glow */}
-      <div className="absolute -inset-6 -z-10 rounded-[3rem] bg-electric/20 blur-3xl" />
+      <div className="absolute -inset-6 -z-10 rounded-[3rem] bg-accent/10 blur-3xl" />
 
-      {/* phone */}
-      <div className="rounded-[2.6rem] border border-navy/10 bg-navy p-2.5 shadow-glow">
-        <div className="overflow-hidden rounded-[2.1rem] bg-slate">
-          {/* messenger header */}
-          <div className="flex items-center gap-3 bg-white px-4 py-3.5">
+      <div className="rounded-[2.6rem] border border-border bg-foreground p-2.5 shadow-dashboard">
+        <div className="overflow-hidden rounded-[2.1rem] bg-secondary">
+          {/* header */}
+          <div className="flex items-center gap-3 bg-background px-4 py-3.5">
             <div className="relative">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-electric text-white">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-accent-foreground">
                 <MessengerMark width={18} height={18} />
               </div>
-              <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500" />
+              <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-background bg-emerald-500" />
             </div>
             <div className="leading-tight">
-              <p className="font-display text-sm font-semibold text-navy">Your Store</p>
+              <p className="text-sm font-semibold text-foreground">Your Store</p>
               <p className="text-[11px] text-emerald-600">● Active now · AI is replying</p>
             </div>
           </div>
 
           {/* messages */}
-          <div
-            ref={scrollRef}
-            className="h-[360px] space-y-2.5 overflow-hidden px-3.5 py-4"
-          >
+          <div ref={scrollRef} className="h-[360px] space-y-2.5 overflow-hidden px-3.5 py-4">
             <AnimatePresence initial={false}>
               {items.map((item, idx) => (
                 <Bubble key={idx} item={item} />
@@ -146,8 +142,8 @@ function Bubble({ item }: { item: Item }) {
           'max-w-[78%] rounded-2xl px-3.5 py-2 text-[13px] leading-snug shadow-sm',
           item.bangla && 'font-bangla',
           incoming
-            ? 'rounded-bl-md bg-white text-navy'
-            : 'rounded-br-md bg-electric text-white'
+            ? 'rounded-bl-md bg-background text-foreground'
+            : 'rounded-br-md bg-accent text-accent-foreground'
         )}
       >
         {item.text}
@@ -165,11 +161,11 @@ function TypingBubble() {
       exit={{ opacity: 0 }}
       className="flex justify-end"
     >
-      <div className="flex items-center gap-1 rounded-2xl rounded-br-md bg-electric/90 px-3.5 py-2.5">
+      <div className="flex items-center gap-1 rounded-2xl rounded-br-md bg-accent/90 px-3.5 py-2.5">
         {[0, 1, 2].map((i) => (
           <motion.span
             key={i}
-            className="h-1.5 w-1.5 rounded-full bg-white"
+            className="h-1.5 w-1.5 rounded-full bg-accent-foreground"
             animate={{ opacity: [0.3, 1, 0.3], y: [0, -2, 0] }}
             transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.15 }}
           />
@@ -188,18 +184,18 @@ function OrderCard() {
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       className="flex justify-end"
     >
-      <div className="w-[88%] rounded-2xl rounded-br-md border border-emerald-200 bg-white p-3.5 shadow-card">
+      <div className="w-[88%] rounded-2xl rounded-br-md border border-emerald-200 bg-background p-3.5 shadow-dashboard">
         <div className="flex items-center gap-2">
           <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-white">
-            <CheckIcon width={15} height={15} />
+            <Check className="h-4 w-4" />
           </span>
           <div className="leading-tight">
-            <p className="font-display text-[13px] font-semibold text-navy">Order #1024</p>
+            <p className="text-[13px] font-semibold text-foreground">Order #1024</p>
             <p className="text-[11px] font-medium text-emerald-600">Confirmed</p>
           </div>
-          <p className="ml-auto font-display text-base font-bold text-navy">৳1,260</p>
+          <p className="ml-auto text-base font-bold text-foreground">৳1,260</p>
         </div>
-        <div className="mt-3 grid grid-cols-2 gap-1.5 text-[11px] text-navy/60">
+        <div className="mt-3 grid grid-cols-2 gap-1.5 text-[11px] text-muted-foreground">
           <span>📍 Dhanmondi 27, Dhaka</span>
           <span className="text-right">🚚 Delivery ৳60</span>
         </div>
@@ -217,14 +213,14 @@ function PaymentCard() {
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       className="flex justify-start"
     >
-      <div className="w-[90%] overflow-hidden rounded-2xl rounded-bl-md bg-white shadow-card">
+      <div className="w-[90%] overflow-hidden rounded-2xl rounded-bl-md bg-background shadow-dashboard">
         <div className="flex items-center gap-2 bg-[#E2136E] px-3.5 py-2 text-white">
           <BkashMark width={15} height={15} />
-          <p className="font-display text-[12px] font-semibold">bKash payment received</p>
+          <p className="text-[12px] font-semibold">bKash payment received</p>
         </div>
         <div className="px-3.5 py-3">
-          <p className="font-display text-lg font-bold text-navy">৳1,260.00</p>
-          <p className="mt-1 text-[11px] leading-relaxed text-navy/55">
+          <p className="text-lg font-bold text-foreground">৳1,260.00</p>
+          <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
             From 0171XXXXXXX · Ref. Order1024
             <br />
             TrxID 9A8B7C6D2E · auto-matched ✅
