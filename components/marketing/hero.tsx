@@ -24,8 +24,9 @@ export function Hero() {
         playsInline
         src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260319_015952_e1deeb12-8fb7-4071-a42a-60779fc64ab6.mp4"
       />
-      {/* readability overlay */}
-      <div className="absolute inset-0 z-0 bg-gradient-to-b from-background via-background/75 to-background/40" />
+      {/* readability scrim — light enough to keep the video clearly visible */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-b from-background/80 via-background/20 to-background/45" />
+      <div className="absolute inset-x-0 top-0 z-0 h-40 bg-gradient-to-b from-background to-transparent" />
 
       <div className="relative z-10 flex w-full flex-col items-center">
         <motion.div {...fade(0, 10)}>
@@ -41,7 +42,7 @@ export function Hero() {
 
         <motion.p
           {...fade(0.2)}
-          className="mt-4 max-w-[650px] text-center text-base leading-relaxed text-muted-foreground md:text-lg"
+          className="mt-4 max-w-[650px] text-center text-base leading-relaxed text-foreground/80 md:text-lg"
         >
           Never miss another late-night order. Let intelligent AI handle your customer chats
           while you scale your business.
