@@ -3,6 +3,7 @@ package ai.sohoj.app.data
 import android.content.Context
 import androidx.room.Dao
 import androidx.room.Database
+import androidx.room.Delete
 import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -10,6 +11,7 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.Update
 import ai.sohoj.app.analytics.FinanceRecord
 import ai.sohoj.app.parser.BkashParser
 import ai.sohoj.app.parser.ParsedTransaction
@@ -35,6 +37,8 @@ data class BkashTxnEntity(
     val occurredAtMillis: Long?,
     val source: String,
     val dedupeHash: String,
+    val confidence: String = "HIGH",
+    val tag: String? = null,
     val synced: Boolean = false,
     val createdAtMillis: Long = System.currentTimeMillis(),
 )
@@ -44,8 +48,14 @@ interface TxnDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(e: BkashTxnEntity): Long
 
-    @Query("SELECT * FROM bkash_transactions ORDER BY occurredAtMillis DESC")
+    @Update suspend fun update(e: BkashTxnEntity)
+    @Delete suspend fun delete(e: BkashTxnEntity)
+
+    @Query("SELECT * FROM bkash_transactions ORDER BY occurredAtMillis DESC, id DESC")
     fun observeAll(): Flow<List<BkashTxnEntity>>
+
+    @Query("SELECT * FROM bkash_transactions WHERE id = :id")
+    suspend fun byId(id: Long): BkashTxnEntity?
 
     @Query("SELECT * FROM bkash_transactions ORDER BY occurredAtMillis DESC")
     suspend fun all(): List<BkashTxnEntity>
@@ -56,11 +66,11 @@ interface TxnDao {
     @Query("UPDATE bkash_transactions SET synced = 1 WHERE id IN (:ids)")
     suspend fun markSynced(ids: List<Long>)
 
-    @Query("SELECT COUNT(*) FROM bkash_transactions WHERE occurredAtMillis >= :sinceMillis")
-    suspend fun countSince(sinceMillis: Long): Int
+    @Query("SELECT COUNT(*) FROM bkash_transactions WHERE trxId = :trxId AND trxId IS NOT NULL")
+    suspend fun countByTrxId(trxId: String): Int
 }
 
-@Database(entities = [BkashTxnEntity::class], version = 1, exportSchema = false)
+@Database(entities = [BkashTxnEntity::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun txnDao(): TxnDao
 
@@ -68,26 +78,33 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile private var instance: AppDatabase? = null
         fun get(context: Context): AppDatabase = instance ?: synchronized(this) {
             instance ?: Room.databaseBuilder(
-                context.applicationContext, AppDatabase::class.java, "sohojai.db"
-            ).build().also { instance = it }
+                context.applicationContext, AppDatabase::class.java, "sohojai.db",
+            ).fallbackToDestructiveMigration().build().also { instance = it }
         }
     }
 }
 
-/** Bridges parser → storage → analytics. */
 class TransactionRepository(private val dao: TxnDao) {
 
-    /** Parse a raw message and persist if it is a recognised bKash transaction. */
+    /** Parse only — does NOT save. Used by confirmation flows. */
+    fun parse(message: String): ParsedTransaction? = BkashParser.parse(message)
+
+    /** Parse + persist (used by automatic ingestion that needs no confirmation). */
     suspend fun ingest(message: String, source: String): ParsedTransaction? {
         val parsed = BkashParser.parse(message) ?: return null
-        dao.insert(parsed.toEntity(source))
+        save(parsed, source)
         return parsed
     }
 
+    suspend fun save(parsed: ParsedTransaction, source: String): Long = dao.insert(parsed.toEntity(source))
+
     fun observeAll(): Flow<List<BkashTxnEntity>> = dao.observeAll()
+    suspend fun byId(id: Long): BkashTxnEntity? = dao.byId(id)
+    suspend fun update(e: BkashTxnEntity) = dao.update(e)
+    suspend fun delete(e: BkashTxnEntity) = dao.delete(e)
     suspend fun unsynced(): List<BkashTxnEntity> = dao.unsynced()
     suspend fun markSynced(ids: List<Long>) = dao.markSynced(ids)
-
+    suspend fun isDuplicateTrx(trxId: String?): Boolean = trxId != null && dao.countByTrxId(trxId) > 1
     suspend fun financeRecords(): List<FinanceRecord> = dao.all().map { it.toRecord() }
 }
 
@@ -104,6 +121,7 @@ fun ParsedTransaction.toEntity(source: String): BkashTxnEntity {
         occurredAtMillis = occurredMillis,
         source = source,
         dedupeHash = dedupe,
+        confidence = confidence.name,
     )
 }
 
@@ -111,11 +129,11 @@ fun BkashTxnEntity.toRecord(): FinanceRecord = FinanceRecord(
     type = runCatching { TxnType.valueOf(type) }.getOrDefault(TxnType.BALANCE_UPDATE),
     amount = BigDecimal(amount),
     fee = BigDecimal(fee),
-    occurredAt = occurredAtMillis?.let {
-        LocalDateTime.ofInstant(Instant.ofEpochMilli(it), DHAKA)
-    },
+    occurredAt = occurredAtMillis?.let { LocalDateTime.ofInstant(Instant.ofEpochMilli(it), DHAKA) },
 )
 
+fun BkashTxnEntity.occurredDateTime(): LocalDateTime? =
+    occurredAtMillis?.let { LocalDateTime.ofInstant(Instant.ofEpochMilli(it), DHAKA) }
+
 private fun sha256(s: String): String =
-    MessageDigest.getInstance("SHA-256").digest(s.toByteArray())
-        .joinToString("") { "%02x".format(it) }
+    MessageDigest.getInstance("SHA-256").digest(s.toByteArray()).joinToString("") { "%02x".format(it) }

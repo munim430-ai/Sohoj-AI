@@ -86,4 +86,15 @@ object AnalyticsEngine {
             (from == null || (r.occurredAt?.toLocalDate()?.isBefore(from) == false)) &&
             (to == null || (r.occurredAt?.toLocalDate()?.isAfter(to) == false))
     }
+
+    fun largest(records: List<FinanceRecord>): FinanceRecord? = records.maxByOrNull { it.amount }
+
+    fun typeBreakdown(records: List<FinanceRecord>): Map<TxnType, BigDecimal> =
+        records.groupBy { it.type }.mapValues { (_, v) -> v.fold(ZERO) { a, r -> a + r.amount } }
+
+    fun inRange(records: List<FinanceRecord>, from: LocalDate, to: LocalDate): Summary =
+        summarize(records.filter {
+            val d = it.occurredAt?.toLocalDate() ?: return@filter false
+            !d.isBefore(from) && !d.isAfter(to)
+        })
 }
