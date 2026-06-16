@@ -1,0 +1,16 @@
+{
+  "_comment": "Example APK self-update manifest. Served at APK_UPDATE_MANIFEST_URL. The client must verify the SHA-256 and the detached signature (manifestSignature, verified against a PINNED public key) before downloading/installing, and must reject downgrades (monotonic versionCode).",
+  "channel": "stable",
+  "latest": {
+    "versionCode": 1,
+    "versionName": "0.1.0",
+    "minSupportedVersionCode": 1,
+    "apkUrl": "https://updates.sohojai.app/stable/sohojai-0.1.0.apk",
+    "sha256": "93c1c68f5a3dcb66893f775ff1f9334e0ce9ead9a470680dfa09005efc2bfbcb",
+    "sizeBytes": 1366295,
+    "releaseNotes": "Initial bKash transaction intelligence release.",
+    "mandatory": false
+  },
+  "manifestSignature": "BASE64_DETACHED_SIGNATURE_OVER_THIS_DOCUMENT",
+  "signingKeyId": "sohojai-release-2026"
+}
