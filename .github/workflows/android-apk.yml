@@ -12,7 +12,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      # Mapped from secrets so the optional-signing step can branch on it.
+      # Mapped from secrets so the optional release-signing step can branch on it.
       RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
     defaults:
       run:
@@ -33,7 +33,7 @@ jobs:
       - name: Install SDK packages
         run: sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools"
 
-      - name: Decode release keystore (optional — signs only if secrets are set)
+      - name: Decode release keystore (optional — signs release only if secrets are set)
         if: ${{ env.RELEASE_KEYSTORE_BASE64 != '' }}
         env:
           RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
@@ -51,22 +51,45 @@ jobs:
       - name: Unit tests
         run: ./gradlew :app:testDebugUnitTest --no-daemon --stacktrace
 
-      - name: Build release APK
+      # Installable preview build (debug-signed → installs on any device).
+      - name: Build debug APK
+        run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
+
+      # Release build kept separate (R8/shrink verification). Its output is NOT
+      # used as the installable preview because the CI release APK is unsigned.
+      - name: Build release APK (separate; not for install)
         run: ./gradlew :app:assembleRelease --no-daemon --stacktrace
 
-      - name: Checksum
+      - name: Stage installable artifacts + checksums
         run: |
-          cd app/build/outputs/apk/release
-          sha256sum *.apk | tee SHA256SUMS.txt
+          mkdir -p dist
+          cp app/build/outputs/apk/debug/app-debug.apk dist/
+          # Include the release APK ONLY if it is actually signed (never the unsigned one).
+          if [ -f app/build/outputs/apk/release/app-release.apk ]; then
+            cp app/build/outputs/apk/release/app-release.apk dist/
+          fi
+          cd dist && sha256sum *.apk | tee SHA256SUMS.txt
 
-      - name: Upload release APK
+      - name: Job summary
+        run: |
+          {
+            echo "### sohojAI APK build"
+            echo ""
+            echo "**Install \`app-debug.apk\` for testing. Unsigned release APK cannot be installed.**"
+            echo ""
+            echo '```'
+            cat dist/SHA256SUMS.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload debug APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: sohojai-release-apk
+          name: sohojai-debug-apk
           # Paths are repo-root-relative (upload-artifact ignores working-directory).
           path: |
-            apps/android/app/build/outputs/apk/release/*.apk
-            apps/android/app/build/outputs/apk/release/SHA256SUMS.txt
+            apps/android/dist/app-debug.apk
+            apps/android/dist/SHA256SUMS.txt
           if-no-files-found: error
           retention-days: 30
 
@@ -80,7 +103,12 @@ jobs:
           fail_on_unmatched_files: true
           body: |
             Automated beta build from `production/android-production`.
-            Attached: release APK + `SHA256SUMS.txt`. Verify with `sha256sum -c SHA256SUMS.txt`.
+
+            **Install `app-debug.apk`** (debug-signed, installable on any device).
+            The CI release APK is unsigned and cannot be installed; a signed release
+            is produced only when signing secrets are configured.
+
+            Verify: `sha256sum -c SHA256SUMS.txt`
           files: |
-            apps/android/app/build/outputs/apk/release/*.apk
-            apps/android/app/build/outputs/apk/release/SHA256SUMS.txt
+            apps/android/dist/app-debug.apk
+            apps/android/dist/SHA256SUMS.txt
